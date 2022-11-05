@@ -19,6 +19,8 @@ def getRecipeLinks(soup) :
 
 
 
+
+
 URL = "https://www.hellofresh.se/recipes/amerikanska-recept?page=20"
 page = requests.get(URL)
 soup = BeautifulSoup(page.content, "html.parser")
@@ -26,22 +28,38 @@ soup = BeautifulSoup(page.content, "html.parser")
 
 recipe_links = getRecipeLinks(soup)
 
+
+
+
+
+#Extract Title, subttitle, ingredients, amount and steps.
+
 recipe_page = requests.get(recipe_links[1])
-print(recipe_links[1])
+
 recipe_page_soup = BeautifulSoup(recipe_page.content, "html.parser")
-print(recipe_page_soup.find('h1').text)
-print(recipe_page_soup.find('h4').text)
 
+title = recipe_page_soup.find('h1').text
 
+tags_p = recipe_page_soup.find_all('p')
 
-for tag_a in recipe_page_soup.find_all('p') :
-    print(tag_a)
+description = tags_p[1]
 
+tags_p.remove(tags_p[0])
+tags_p.remove(tags_p[0])
 
+for tag_p in tags_p :
 
+    
+    # Ingredients
+    try :
+        if type(tag_p['class']) :
 
-#for recepi_link in recipe_links :
+    # Steps
+    except :
+        
 
+#file = open(title, 'w')
+#file.write(title)
 
 
 
