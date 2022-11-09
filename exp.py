@@ -56,6 +56,10 @@ page = requests.get(URL)
 soup = BeautifulSoup(page.content, "html.parser")
 
 
+
+
+# Extract duration and nutritional value.
+
 recipe_links = getRecipeLinks(soup)
 
 recipe_page = requests.get(recipe_links[1])
@@ -63,21 +67,41 @@ recipe_page = requests.get(recipe_links[1])
 recipe_page_soup = BeautifulSoup(recipe_page.content, "html.parser")
 
 isNutrient = False
+isDuration = False
+
+nutrients = []
+duration = ""
+
 for tag_span in recipe_page_soup.find_all('span') :
 
     if tag_span.text == "Näringsvärden" :
         isNutrient = True
+        continue
 
     if tag_span.text == "Köksredskap" :
         isNutrient = False
+        continue
+
+    if tag_span.text == "Tillagningstid" :
+        isDuration = True
+        continue
+
+    if isDuration : 
+        duration = tag_span.text
+        isDuration = False
 
     if isNutrient :
-        print(tag_span)
+        nutrients.append(tag_span.text)
 
 
 
 
-# Extract duration and nutritional value.
+print(duration)
+print(nutrients)
+
+
+
+
 
 
 
