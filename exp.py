@@ -49,56 +49,60 @@ def getTitle_Ingredients_Steps(recipe_link) :
     return title, description, ingredients, steps
 
 
-
-
-URL = "https://www.hellofresh.se/recipes/amerikanska-recept?page=20"
-page = requests.get(URL)
-soup = BeautifulSoup(page.content, "html.parser")
-
-
-
-
 # Extract duration and nutritional value.
+def get_Nutrients_Duration(recipe_page_soup) :
 
-recipe_links = getRecipeLinks(soup)
+    isNutrient = False
+    isDuration = False
 
-recipe_page = requests.get(recipe_links[1])
+    nutrients = []
+    duration = ""
 
-recipe_page_soup = BeautifulSoup(recipe_page.content, "html.parser")
+    for tag_span in recipe_page_soup.find_all('span') :
 
-isNutrient = False
-isDuration = False
+        if tag_span.text == "Näringsvärden" :
+            isNutrient = True
+            continue
 
-nutrients = []
-duration = ""
+        if tag_span.text == "Köksredskap" :
+            isNutrient = False
+            continue
 
-for tag_span in recipe_page_soup.find_all('span') :
+        if tag_span.text == "Tillagningstid" :
+            isDuration = True
+            continue
 
-    if tag_span.text == "Näringsvärden" :
-        isNutrient = True
-        continue
+        if isDuration : 
+            duration = tag_span.text
+            isDuration = False
 
-    if tag_span.text == "Köksredskap" :
-        isNutrient = False
-        continue
+        if isNutrient :
+            nutrients.append(tag_span.text)
 
-    if tag_span.text == "Tillagningstid" :
-        isDuration = True
-        continue
-
-    if isDuration : 
-        duration = tag_span.text
-        isDuration = False
-
-    if isNutrient :
-        nutrients.append(tag_span.text)
+    return nutrients, duration
 
 
+def linkToSoup(URL) :
+
+    page = requests.get(URL)
+    soup = BeautifulSoup(page.content, "html.parser")
+
+    return soup
 
 
-print(duration)
-print(nutrients)
 
+
+URL = "https://www.hellofresh.se/recipes"
+soup = linkToSoup(URL)
+
+categories =  [tag_a.get('href') for tag_a in soup.find_all('a')]
+
+categories = [for link in categories if link]
+
+print(categories)
+
+
+#Get all recipe category pages
 
 
 
