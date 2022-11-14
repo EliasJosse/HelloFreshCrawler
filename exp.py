@@ -91,19 +91,19 @@ def linkToSoup(URL) :
 
 
 
+#Get all recipe category pages on page
+def get_Category_Links(URL) :
 
-URL = "https://www.hellofresh.se/recipes"
-soup = linkToSoup(URL)
+    soup = linkToSoup(URL)
 
-categories =  [tag_a.get('href') for tag_a in soup.find_all('a')]
+    links =  [tag_a.get('href') for tag_a in soup.find_all('a')]
 
-categories = [for link in categories if link]
+    category_links = [ URL + string.replace("/recipes","") + "?page=20" for string in links if type(string) is str and "recept" in string]
 
-print(categories)
+    return category_links
 
 
-#Get all recipe category pages
-
+get_Category_Links("www.hellofresh.se")
 
 
 
