@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 
 
 #Gather all recipe links on page
-def getRecipeLinks(soup) :
+def get_Recipe_Links(soup) :
     links = [tag_a.get('href') for tag_a in soup.find_all('a')]
 
     #recipe links end with  '-' + <24 hex-digits>
@@ -18,9 +18,8 @@ def getRecipeLinks(soup) :
 
 #Extract Title, description, ingredients, amount, and steps.
 def getTitle_Ingredients_Steps(recipe_link) :
-    recipe_page = requests.get(recipe_link)
 
-    recipe_page_soup = BeautifulSoup(recipe_page.content, "html.parser")
+    recipe_page_soup = link_To_Soup(recipe_link)
 
     title = recipe_page_soup.find('h1').text
 
@@ -50,7 +49,9 @@ def getTitle_Ingredients_Steps(recipe_link) :
 
 
 # Extract duration and nutritional value.
-def get_Nutrients_Duration(recipe_page_soup) :
+def get_Nutrients_Duration(recipe_link) :
+
+    recipe_page_soup = link_To_Soup(recipe_link)
 
     isNutrient = False
     isDuration = False
@@ -82,7 +83,7 @@ def get_Nutrients_Duration(recipe_page_soup) :
     return nutrients, duration
 
 
-def linkToSoup(URL) :
+def link_To_Soup(URL) :
 
     page = requests.get(URL)
     soup = BeautifulSoup(page.content, "html.parser")
@@ -103,16 +104,17 @@ def get_Category_Links(URL) :
     return category_links
 
 
-get_Category_Links("www.hellofresh.se")
 
-
-
-
-
-
-
-#file = open(title, 'w')
-#file.write(title)
+# write recipe to file
+path = "D:/programmering/"
+recipeName = "NameOfRecipe"
+filename = path + recipeName + ".txt"
+file = open(filename, 'w')
+file.write( recipeName +"\n"
+           "Salt   1g    \n"
+           "Peppar 2g    \n"
+           "Energi 2000 Kcal \n")
+file.close()
 
 
 
