@@ -23,9 +23,9 @@ def getTitle_Ingredients_Steps(recipe_link) :
 
     title = recipe_page_soup.find('h1').text
 
-    tags_p = recipe_page_soup.find_all('p')
+    description = recipe_page_soup.find('h4').text    
 
-    description = tags_p[1]
+    tags_p = recipe_page_soup.find_all('p')
 
     tags_p.remove(tags_p[0])
     tags_p.remove(tags_p[0])
@@ -95,7 +95,7 @@ def link_To_Soup(URL) :
 #Get all recipe category pages on page
 def get_Category_Links(URL) :
 
-    soup = linkToSoup(URL)
+    soup = link_To_Soup(URL)
 
     links =  [tag_a.get('href') for tag_a in soup.find_all('a')]
 
@@ -106,14 +106,33 @@ def get_Category_Links(URL) :
 
 
 # write recipe to file
-path = "D:/programmering/"
-recipeName = "NameOfRecipe"
-filename = path + recipeName + ".txt"
+
+recipeLink = "https://www.hellofresh.se/recipes/tex-mex-kryddad-kyckling-630c9788c7f7abb7359088e4"
+title,desc,ingredients,steps = getTitle_Ingredients_Steps(recipeLink)
+nutrients,duration = get_Nutrients_Duration(recipeLink)
+
+
+
+path = "D:/programmering/recipes/"
+
+filename = path + title + ".txt"
+
 file = open(filename, 'w')
-file.write( recipeName +"\n"
-           "Salt   1g    \n"
-           "Peppar 2g    \n"
-           "Energi 2000 Kcal \n")
+
+file.write( title +"\n" )
+
+file.write( desc + "  \n\n")
+
+for i in range(len(ingredients)) :
+    if(i % 2 == 0) :
+        file.write(ingredients[i] + "   ")
+    else :
+        file.write(ingredients[i] + " \n")
+for step in steps:
+    file.write( "1.  " + step + " \n\n")
+
+
+
 file.close()
 
 
