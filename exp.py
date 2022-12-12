@@ -91,7 +91,6 @@ def link_To_Soup(URL) :
     return soup
 
 
-
 #Get all recipe category pages on page
 def get_Category_Links(URL) :
 
@@ -103,40 +102,40 @@ def get_Category_Links(URL) :
 
     return category_links
 
-
-
 # write recipe to file
+def writeRecipeToFile(recipeLink) :
 
-recipeLink = "https://www.hellofresh.se/recipes/tex-mex-kryddad-kyckling-630c9788c7f7abb7359088e4"
-title,desc,ingredients,steps = getTitle_Ingredients_Steps(recipeLink)
-nutrients,duration = get_Nutrients_Duration(recipeLink)
+    path = "D:/programmering/recipes/"
+
+    title,desc,ingredients,steps = getTitle_Ingredients_Steps(recipeLink)
+    nutrients,duration = get_Nutrients_Duration(recipeLink)             
+
+    filename = path + title + ".txt"
+    file = open(filename, 'w')
+
+    file.write( title + "\n" )
+
+    file.write( desc + "  \n\n")
+
+    for i in range(len(ingredients)) :
+        if(i % 2 == 0) :
+            file.write(ingredients[i] + "   ")
+        else :
+            file.write(ingredients[i] + " \n")
+
+    file.write("\n")
+
+    stepCount = 1
+    for step in steps:
+        file.write( str(stepCount) +  ".  " + step + " \n\n")
+        stepCount = stepCount + 1
 
 
-
-path = "D:/programmering/recipes/"
-
-filename = path + title + ".txt"
-
-file = open(filename, 'w')
-
-file.write( title +"\n" )
-
-file.write( desc + "  \n\n")
-
-for i in range(len(ingredients)) :
-    if(i % 2 == 0) :
-        file.write(ingredients[i] + "   ")
-    else :
-        file.write(ingredients[i] + " \n")
-for step in steps:
-    file.write( "1.  " + step + " \n\n")
-
-
-
-file.close()
+    file.close()
 
 
 
 
 
     
+recipeLink = "https://www.hellofresh.se/recipes/tex-mex-kryddad-kyckling-630c9788c7f7abb7359088e4"
