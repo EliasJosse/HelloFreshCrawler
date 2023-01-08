@@ -3,8 +3,17 @@
 
 
 import requests
+import Recipe
 from bs4 import BeautifulSoup
 
+
+
+def URL_To_Soup(URL) :
+
+    page = requests.get(URL)
+    soup = BeautifulSoup(page.content, "html.parser", multi_valued_attributes=None)
+
+    return soup
 
 #Gather all recipe links on page
 def get_Recipe_Links(soup) :
@@ -17,18 +26,22 @@ def get_Recipe_Links(soup) :
     return recipe_links
 
 #Extract Title, description, ingredients, amount, and steps.
-def getTitle_Ingredients_Steps(recipe_link) :
+def getTitle_Ingredients_Steps(recipeSoup) :
 
-    recipe_page_soup = link_To_Soup(recipe_link)
+    title = recipeSoup.find('h1').text
 
-    title = recipe_page_soup.find('h1').text
+    if("verkar" in title) :
+        return 1,1,1,1
 
-    description = recipe_page_soup.find('h4').text    
+    description = recipeSoup.find('h4').text
+   
+    tags_p = recipeSoup.find_all('p')
 
-    tags_p = recipe_page_soup.find_all('p')
-
-    tags_p.remove(tags_p[0])
-    tags_p.remove(tags_p[0])
+    try :
+        tags_p.remove(tags_p[0])
+        tags_p.remove(tags_p[0])
+    except :
+        print(recipeLink)
 
     ingredients = []
     steps = []
@@ -36,22 +49,22 @@ def getTitle_Ingredients_Steps(recipe_link) :
     for tag_p in tags_p :
 
         
-        # Ingredients
-        try :
-            if type(tag_p['class']) :
-                ingredients.append(tag_p.text)
-            
+        # Ingredients and amounts
+    #step    
+    #ingredient   dsbz dsct dsft dsbn dsbp dsbq dsfu
+    #ignredient   dsbz dsct dsft dsbn dsbp dsbq dsfu
+        if "dsbz dsct dsfs dsbn dsbp dsbq dsft" == tag_p.get('class') :
+            ingredients.append(tag_p.text)
+
         # Steps
-        except :
+        else :
             steps.append(tag_p.text)
     
     return title, description, ingredients, steps
 
 
 # Extract duration and nutritional value.
-def get_Nutrients_Duration(recipe_link) :
-
-    recipe_page_soup = link_To_Soup(recipe_link)
+def get_Nutrients_Duration(recipeSoup) :
 
     isNutrient = False
     isDuration = False
@@ -59,7 +72,7 @@ def get_Nutrients_Duration(recipe_link) :
     nutrients = []
     duration = ""
 
-    for tag_span in recipe_page_soup.find_all('span') :
+    for tag_span in recipeSoup.find_all('span') :
 
         if tag_span.text == "Näringsvärden" :
             isNutrient = True
@@ -83,18 +96,8 @@ def get_Nutrients_Duration(recipe_link) :
     return nutrients, duration
 
 
-def link_To_Soup(URL) :
-
-    page = requests.get(URL)
-    soup = BeautifulSoup(page.content, "html.parser")
-
-    return soup
-
-
 #Get all recipe category pages on page
-def get_Category_Links(URL) :
-
-    soup = link_To_Soup(URL)
+def get_Category_Links(categorySoup) :
 
     links =  [tag_a.get('href') for tag_a in soup.find_all('a')]
 
@@ -103,39 +106,32 @@ def get_Category_Links(URL) :
     return category_links
 
 # write recipe to file
-def writeRecipeToFile(recipeLink) :
+def write_Recipe_To_File(recipe, outputPath) :
+ 
+    if(title == 1) : return
 
-    path = "D:/programmering/recipes/"
+    filename = outputPath + recipe.title + ".txt"
 
-    title,desc,ingredients,steps = getTitle_Ingredients_Steps(recipeLink)
-    nutrients,duration = get_Nutrients_Duration(recipeLink)             
+    file = open(filename, 'w', encoding="utf-8")
 
-    filename = path + title + ".txt"
-    file = open(filename, 'w')
-
-    file.write( title + "\n" )
-
-    file.write( desc + "  \n\n")
-
-    for i in range(len(ingredients)) :
-        if(i % 2 == 0) :
-            file.write(ingredients[i] + "   ")
-        else :
-            file.write(ingredients[i] + " \n")
-
-    file.write("\n")
-
-    stepCount = 1
-    for step in steps:
-        file.write( str(stepCount) +  ".  " + step + " \n\n")
-        stepCount = stepCount + 1
-
+    file.write(recipe.__str__())
 
     file.close()
 
 
+source = "https://www.hellofresh.se/recipes/appelburgare-5f2a7eb6ae5bb563d564abaf"
+
+soup = URL_To_Soup(source)
+
+title, description, ingredients, steps = getTitle_Ingredients_Steps(soup)
+
+nutrients, duration = get_Nutrients_Duration(soup)
+
+recipe = Recipe.Recipe(title, description, ingredients, steps, nutrients, duration, source)
+
+
+print(recipe)
 
 
 
-    
-recipeLink = "https://www.hellofresh.se/recipes/tex-mex-kryddad-kyckling-630c9788c7f7abb7359088e4"
+
